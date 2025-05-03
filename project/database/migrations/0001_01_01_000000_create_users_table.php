@@ -12,11 +12,35 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
+            $table->id()->autoIncrement();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('email')->unique();
+            $table->boolean('email_v_status')->default(false);
+            $table->string("phone_number")->unique()->nullable();
+            $table->string("bvn")->unique()->nullable();
+            $table->boolean('bvn_v_status')->default(false);
+            $table->string("nin")->unique()->nullable();
+            $table->boolean('nin_v_status')->default(false);
+            $table->string("otp")->nullable();
+            $table->decimal('balance', 60, 2)->default(0);
+            $table->decimal('income', 60, 2)->default(0);
+            $table->decimal('expenses', 60, 2)->default(0);
+            $table->timestamp('otp_verified_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->text('device_token')->nullable();
+            $table->text('device_id')->nullable();
+            $table->text('token')->nullable();
+            $table->string('pin')->nullable();
+            $table->boolean('receive_transaction_emails')->default(true);
+            $table->boolean('receive_push_notifications')->default(true);
+            $table->boolean('weekly_newsletters')->default(true);
+            $table->string('account_type')->default("user");
+            $table->integer('tier')->default(1);
+            $table->string('promo_code')->nullable();
+            $table->string('invited_by')->nullable();
+            $table->boolean('status')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
