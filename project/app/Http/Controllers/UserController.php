@@ -12,11 +12,11 @@ class UserController extends Controller
     // Get user balance
     public function getUserBalance(Request $request){
         try {
-            // $userId = $request->input("user_id");
-            // $user = User::where("id", $userId)->first();
+            $userId = $request->input("user_id");
+            $user = User::where("id", $userId)->first();
             return response()->json([
                 "status" => 200,
-                "message" => "Success",
+                "message" => $user->balance,
             ]);
         } catch (Exception $error) {
             // Log error to the server
