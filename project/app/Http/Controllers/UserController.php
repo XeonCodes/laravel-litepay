@@ -3,14 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
     // Get user balance
     public function getUserBalance(Request $request){
-        $userId = $request->input("user_id");
-        $user = User::where("id", $userId)->first();
-        return $user->balance;
+        try {
+            $userId = $request->input("user_id");
+            $user = User::where("id", $userId)->first();
+            return $user->balance;
+        } catch (Exception $error) {
+            // Log error to the server
+            Log::error($error->getMessage());
+            return response()->json([
+                "status" => 500,
+                "message" => "Something went wrong",
+            ]);
+        }
     }
 }
