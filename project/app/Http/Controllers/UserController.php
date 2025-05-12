@@ -20,20 +20,20 @@ class UserController extends Controller
                 return response()->json([
                     "status" => 404,
                     "message" => "Bad request",
-                ]);
+                ], 400);
             }
 
             return response()->json([
                 "status" => 200,
                 "message" => $user->balance,
-            ]);
+            ], 200);
         } catch (Exception $error) {
             // Log error to the server
             Log::error($error->getMessage());
             return response()->json([
                 "status" => 500,
                 "message" => "Something went wrong",
-            ]);
+            ], 500);
         }
     }
 }
