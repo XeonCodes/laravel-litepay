@@ -11,6 +11,6 @@ class UserController extends Controller
     public function getUserBalance(Request $request){
         $userId = $request->input("user_id");
         $user = User::where("id", $userId)->first();
-        return $user->balance();
+        return $user->balance;
     }
 }
