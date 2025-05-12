@@ -10,4 +10,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Router::get("/userbalance", [UserController::class, "getUserBalance"])->middleware('auth:sanctum');
+Router::get("/userbalance", [UserController::class, "getUserBalance"]);
