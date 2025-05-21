@@ -51,6 +51,9 @@ class User extends Authenticatable
         'daily_bonus'
     ];
 
+    // Append
+    // protected $append = ['virtual_accounts', 'transactions'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -81,6 +84,17 @@ class User extends Authenticatable
      */
     protected function getUserName() {
         return strtoupper($this->username) . " For user";
+    }
+
+
+    // Get Username (Getter)
+    public function getUsernameAttribute($value){
+        return strtoupper($value);
+    }
+
+    // Mutate email to lowercase
+    public function setEmailAttribute($value){
+        $this->attributes['email'] = strtolower($value);
     }
 
 }

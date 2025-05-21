@@ -9,4 +9,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::post("/user", [UserController::class, "register"]);
+// Route group for onboarding
+Route::group(['prefix' => 'onboarding', 'namespace' => 'App\Http\Controllers'], function(){
+    Route::post("/user", [UserController::class, "register"]);
+});
