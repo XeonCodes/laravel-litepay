@@ -88,7 +88,7 @@ class UserController extends Controller
                 $message = "Welcome to our service! Your account has been created successfully. Your OTP is: {$otp}";
                 Mail::to($request->email)->send(new GeneralMail($message, strtoupper($request->username), "Welcome to " . env("APP_NAME") ));
             } catch (Exception $th) {
-                Log::error("Error sending email: " . $th->getMessage());
+                Log::error("Error sending email: $th");
             }
 
             DB::commit();
