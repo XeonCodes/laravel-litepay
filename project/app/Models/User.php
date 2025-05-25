@@ -52,7 +52,7 @@ class User extends Authenticatable
     ];
 
     // Append
-    // protected $append = ['virtual_accounts', 'transactions'];
+    protected $append = ['notifications'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -95,6 +95,13 @@ class User extends Authenticatable
     // Mutate email to lowercase
     public function setEmailAttribute($value){
         $this->attributes['email'] = strtolower($value);
+    }
+
+
+    // Get notifications
+    public function getNotificationsAttribute() {
+        return $this->hasMany(NotificationModel::class, 'user_id', 'id')
+            ->orderBy('created_at', 'desc');
     }
 
 }

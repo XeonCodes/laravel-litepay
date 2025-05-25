@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\GeneralMail;
+use App\Models\NotificationModel;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -73,9 +76,20 @@ class UserController extends Controller
             ]);
 
             // Notification
+            NotificationModel::create([
+                "user_id" => $user->id,
+                "title" => "Welcome to Our Service",
+                "message" => "Hello {$user->first_name}, welcome to our service! Your account has been created successfully.",
+                "type" => "welcome"
+            ]);
             
-
             // Email notification
+            try {
+                $message = "Hello {$user->first_name}, welcome to our service! Your account has been created successfully. Your OTP is: {$otp}";
+                Mail::to($user->email)->send(new GeneralMail($message, $user->username, "Welcome to ".env("APP_NAME")));
+            } catch (Exception $th) {
+                Log::error("Error sending email: " . $th->getMessage());
+            }
 
             DB::commit();
             
