@@ -35,7 +35,7 @@ class UserController extends Controller
                 "first_name" => "required|string|max:15",
                 "last_name" => "required|string|max:15",
                 "email" => "required|email|unique:users,email",
-                "username" => "required|min3|max:15",
+                "username" => "required|unique:users,username|min:3|max:15",
                 "phone_number" => "required|unique:users,phone_number|regex:/^0[0-9]{10}$/",
                 "password" => "required|string|min:6"
             ]);
@@ -44,7 +44,7 @@ class UserController extends Controller
             if($validate->fails()){
                 return response()->json([
                     "status" => 422,
-                    "message" => $validate->errors()->first(),
+                    "message" => $validate->errors()->first()
                 ], 422);
             }
 
