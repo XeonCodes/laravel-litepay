@@ -44,7 +44,7 @@ class UserController extends Controller
             if($validate->fails()){
                 return response()->json([
                     "status" => 422,
-                    "message" => $validate->errors()
+                    "message" => $validate->errors()->first(),
                 ], 422);
             }
 
