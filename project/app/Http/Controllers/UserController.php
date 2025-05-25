@@ -36,7 +36,7 @@ class UserController extends Controller
                 "last_name" => "required|string|max:15",
                 "email" => "required|email|unique:users,email",
                 "username" => "required|unique:users,username|min:3|max:15",
-                "phone_number" => "required|unique:users,phone_number|regex:/^0[0-9]{10}$/",
+                "phone_number" => "required|regex:/^0[0-9]{10}$/",
                 "password" => "required|string|min:6"
             ]);
 
