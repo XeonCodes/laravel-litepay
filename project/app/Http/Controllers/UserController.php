@@ -8,6 +8,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -72,7 +73,7 @@ class UserController extends Controller
                 "password" => bcrypt($request->password),
                 "promo_code" => $this->GenerateContoller->GeneratePromoCode(),
                 "invited_by" => $invitedBy,
-                "otp" => bcrypt($otp)
+                "otp" => bcrypt(value: $otp)
             ]);
 
             // Notification
@@ -115,4 +116,65 @@ class UserController extends Controller
                 ], 500);
         }
     }
+
+
+    // Login function
+    public function login(Request $request){
+
+        // Validation rule
+        $validate = Validator::make($request->all(), [
+            "email" => "required|string|email",
+            "password" => "required|string"
+        ]);
+
+        // Check if validation is successful.
+        if($validate->fails()){
+            return response()->json([
+                "status" => 422,
+                "message" => $validate->errors()->first()
+            ]);
+        }
+
+        // Resolve user
+        $user = User::where("email", $request->input("email"))->first();
+
+        // Check if user exist
+        if(!$user){
+            return response()->json([
+                "status" => 404,
+                "message" => "Email or password is incorrect"
+            ], 404);
+        }
+
+        // Check if email and password correct
+        if(!Hash::check($request->password, $user->password)){
+            return response()->json([
+                "status" => 401,
+                "message" => "Email or password is incorrect"
+            ], 401);
+        }
+
+        $otp = $this->GenerateContoller->GenerateOtp();
+        try {
+            $message = "Welcome back to ".env("APP_NAME")." Your OTP is $otp";
+            Mail::to($user->email)->send(new GeneralMail($message, $user->username, "Welcome Back"));
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+        }
+
+        // Return a success response with the user Payload
+        return response()->json([
+            "status" => 200,
+            "message" => "Login successful",
+            "data" => $user
+        ], 200);
+
+
+    }
+
+
+    
+
 }
+
+
