@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AdminModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -25,8 +26,8 @@ class AdminController extends Controller
         }
 
         $lastRefreshTime = $admin->monnify_access_token_lasttime;
-        if ($lastRefreshTime && now()->diffInMinutes(\Carbon\Carbon::parse($lastRefreshTime)) < 20) {
-            Log::info("Monnify access token is still valid, no need to refresh");
+        if ($lastRefreshTime && now()->diffInMinutes( Carbon::parse($lastRefreshTime)) < 20) {
+            Log::info("Monnify access token is still valid, no need to refresh" . now()->diffInMinutes(Carbon::parse($lastRefreshTime)));
             return false;
         }
 
