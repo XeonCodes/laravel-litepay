@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\VirtualAccountModel;
 use Illuminate\Http\Request;
 
 class GenerateController extends Controller
@@ -21,6 +22,15 @@ class GenerateController extends Controller
             $promoCode .= $characters[rand(0, strlen($characters) - 1)];
         }
         return $promoCode;
+    }
+
+    // Generate Virtual Account Reference
+    public function GenerateVirtualAccountReference()
+    {
+        do {
+            $ref = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 15);
+        } while (VirtualAccountModel::where('account_reference', $ref)->exists());
+        return $ref;
     }
 
 }

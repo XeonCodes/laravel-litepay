@@ -93,6 +93,8 @@ class UserController extends Controller
             }
 
             DB::commit();
+
+            // Create a virtual account
             
             // Success response
             return response()->json([
