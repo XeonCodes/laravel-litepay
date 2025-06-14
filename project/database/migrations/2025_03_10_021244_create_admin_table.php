@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('admin', function (Blueprint $table) {
             $table->id();
+            $table->text('monnify_access_token')->nullable();
+            $table->timestamp('monnify_access_token_lasttime')->nullable();
             $table->timestamps();
         });
     }
