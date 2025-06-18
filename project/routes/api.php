@@ -14,4 +14,4 @@ Route::group(['prefix' => 'onboarding', 'namespace' => 'App\Http\Controllers'], 
 });
 
 // Refresh apis here
-Route::post("/monnify/refresh", [AdminController::class, "refreshMonnifyAccessToken"]);
+Route::get("/monnify/refresh", [AdminController::class, "refreshMonnifyAccessToken"]);
