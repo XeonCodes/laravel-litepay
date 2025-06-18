@@ -158,6 +158,8 @@ class UserController extends Controller
         }
 
         $otp = $this->GenerateContoller->GenerateOtp();
+        Log::info("Generated OTP: $otp");
+
         try {
             $message = "Welcome back to ".env("APP_NAME")." Your OTP is $otp";
             Mail::to($user->email)->send(new GeneralMail($message, $user->username, "Welcome Back"));
