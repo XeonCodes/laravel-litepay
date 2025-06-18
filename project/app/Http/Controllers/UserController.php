@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewCustomerCreated;
 use App\Mail\GeneralMail;
 use App\Models\NotificationModel;
 use App\Models\User;
+use App\Models\VirtualAccountModel;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -93,8 +95,6 @@ class UserController extends Controller
             }
 
             DB::commit();
-
-            // Create a virtual account
             
             // Success response
             return response()->json([
@@ -118,7 +118,6 @@ class UserController extends Controller
                 ], 500);
         }
     }
-
 
     // Login function
     public function login(Request $request){
@@ -175,6 +174,59 @@ class UserController extends Controller
     }
 
 
+    // Verify OTP
+    public function verifyOtp(Request $request){
+        // Validate the request
+        $validate = Validator::make($request->all(), [
+            "email" => "required|email",
+            "otp" => "required|numeric|digits:6"
+        ]);
+
+        // Check if validation fails
+        if($validate->fails()){
+            return response()->json([
+                "status" => 422,
+                "message" => $validate->errors()->first()
+            ], 422);
+        }
+
+        // Resolve user
+        $user = User::where("email", $request->input("email"))->first();
+
+        // Check if user exist
+        if(!$user){
+            return response()->json([
+                "status" => 404,
+                "message" => "User not found"
+            ], 404);
+        }
+
+        // Check if OTP is correct
+        if(!Hash::check($request->otp, $user->otp)){
+            return response()->json([
+                "status" => 401,
+                "message" => "Invalid OTP"
+            ], 401);
+        }
+
+        // Update user OTP to null
+        $user->otp = null;
+        $user->save();
+
+        // Access virtual acount table
+        $virtualAccount = VirtualAccountModel::where("user_id", $user->id)->first();
+        // Check if virtual account exists
+        if(!$virtualAccount){
+            NewCustomerCreated::dispatch($user);
+        }
+
+        // Return a success response with the user Payload
+        return response()->json([
+            "status" => 200,
+            "message" => "OTP verified successfully",
+            "data" => $user
+        ], 200);
+    }
     
 
 }
