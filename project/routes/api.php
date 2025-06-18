@@ -11,6 +11,7 @@ Route::get('/user', fn(Request $request) => $request->user())->middleware('auth:
 // Route group for onboarding
 Route::group(['prefix' => 'onboarding', 'namespace' => 'App\Http\Controllers'], function(){
     Route::post("/user", [UserController::class, "register"]);
+    Route::post("/user/login", [UserController::class, "login"]);
 });
 
 // Refresh apis here
