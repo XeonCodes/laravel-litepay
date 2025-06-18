@@ -165,6 +165,10 @@ class UserController extends Controller
             Log::error($th->getMessage());
         }
 
+        // Update user OTP
+        $user->otp = bcrypt($otp);
+        $user->save();
+
         // Return a success response with the user Payload
         return response()->json([
             "status" => 200,
