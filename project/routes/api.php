@@ -14,5 +14,11 @@ Route::group(['prefix' => 'onboarding', 'namespace' => 'App\Http\Controllers'], 
     Route::post("/user/login", [UserController::class, "login"]);
 });
 
+
+// Verify without token
+Route::group(['prefix' => 'verify', 'namespace' => 'App\Http\Controllers'], function(){
+    Route::post("/otp", [UserController::class, "verifyOtp"]);
+});
+
 // Refresh apis here
 Route::get("/monnify/refresh", [AdminController::class, "refreshMonnifyAccessToken"]);
