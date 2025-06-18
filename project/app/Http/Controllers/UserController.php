@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
 
-
     // Import Controllers
     protected $GenerateContoller;
     protected $ApiController;
@@ -180,7 +179,6 @@ class UserController extends Controller
 
 
     }
-
 
     // Verify OTP
     public function verifyOtp(Request $request){
