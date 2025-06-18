@@ -56,6 +56,8 @@ class UserController extends Controller
 
             $otp = $this->GenerateContoller->GenerateOtp();
 
+            Log::info("Generated OTP: $otp");
+
             $invitedBy = "";
 
             if($request->invited_by){
