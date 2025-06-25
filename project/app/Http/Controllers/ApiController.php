@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ApiController extends Controller
 {
@@ -35,4 +36,39 @@ class ApiController extends Controller
         }
 
     }
+
+
+    public function SendPushNotification ($to, $title, $body, $data) {
+
+        try {
+
+            $response = Http::withHeaders([
+                "Content-Type" => "application/json"
+            ])->post('https://exp.host/--/api/v2/push/send', [
+                'to' => $to,
+                'sound' => 'default',
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+            ]);
+
+            $response->throw();
+
+            Log::info($response);
+
+            return [
+                'status' => true,
+                'message' => 'Push notification sent successfully'
+            ];
+
+        } catch (\Throwable $th) {
+            Log::error('Error sending push notification: '. $th->getMessage());
+            return [
+            'status' => false,
+            'message' => 'Failed to send push notification'
+            ];
+        }
+
+    }
+
 }
