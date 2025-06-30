@@ -126,7 +126,7 @@ class VTUController extends Controller
 
         // Purchase airtime for this user
         $buy = Http::withHeaders([
-            "Authorization" => env(""),
+            "Authorization" => "Token ". env("DATASTATION_API"),
             "Content-Type" => "application/json"
         ])->post(env("DATASTATION_URL") . "/topup", [
             "network" => $network,
