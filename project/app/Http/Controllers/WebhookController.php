@@ -17,6 +17,7 @@ class WebhookController extends Controller
 {
 
     protected $GenerateController;
+    
     protected $ApiController;
 
     public function __construct(GenerateController $GenerateController, ApiController $ApiController){

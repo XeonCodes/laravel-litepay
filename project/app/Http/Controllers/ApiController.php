@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class ApiController extends Controller
 {
+
     // Buy Airtime
     public function BuyAirtimeClubkon($network, $amount, $phone_number, $ref){
 
@@ -37,7 +38,7 @@ class ApiController extends Controller
 
     }
 
-
+    // Send Push Notification
     public function SendPushNotification ($to, $title, $body, $data) {
 
         try {
