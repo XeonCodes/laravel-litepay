@@ -67,7 +67,7 @@ class UserController extends Controller
             }
 
             // Create a new user
-            $user = DB::table("user")->insertOrIgnore([
+            $user = DB::table("users")->insertOrIgnore([
                 "first_name" => $request->first_name,
                 "last_name" => $request->last_name,
                 "email" => $request->email,
@@ -80,7 +80,6 @@ class UserController extends Controller
             ]);
 
             DB::commit();
-
 
             $user = User::where('email', $request->email)->first();
 
