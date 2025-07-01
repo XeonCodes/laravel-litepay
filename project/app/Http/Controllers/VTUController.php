@@ -23,7 +23,6 @@ class VTUController extends Controller
     
     public function BuyAirtime(Request $request){
 
-
         $validate = Validator::make($request->all(), [
             'network' => 'required|string',
             'amount' => 'required|numeric|min:1',
@@ -166,5 +165,7 @@ class VTUController extends Controller
         ], 200);
 
     }
+
+    
 
 }

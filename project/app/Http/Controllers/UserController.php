@@ -97,7 +97,6 @@ class UserController extends Controller
 
             DB::commit();
 
-
             // Generate Token
             $token = $user->createToken('mobile-app', ['read'])->plainTextToken;
 
