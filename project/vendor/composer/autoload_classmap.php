@@ -6,8 +6,22 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Events\\NewCustomerCreated' => $baseDir . '/app/Events/NewCustomerCreated.php',
+    'App\\Http\\Controllers\\AdminController' => $baseDir . '/app/Http/Controllers/AdminController.php',
+    'App\\Http\\Controllers\\ApiController' => $baseDir . '/app/Http/Controllers/ApiController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+    'App\\Http\\Controllers\\GenerateController' => $baseDir . '/app/Http/Controllers/GenerateController.php',
+    'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',
+    'App\\Http\\Controllers\\VTUController' => $baseDir . '/app/Http/Controllers/VTUController.php',
+    'App\\Http\\Controllers\\VerifyController' => $baseDir . '/app/Http/Controllers/VerifyController.php',
+    'App\\Http\\Controllers\\WebhookController' => $baseDir . '/app/Http/Controllers/WebhookController.php',
+    'App\\Listeners\\CreateVirtualAccount' => $baseDir . '/app/Listeners/CreateVirtualAccount.php',
+    'App\\Mail\\GeneralMail' => $baseDir . '/app/Mail/GeneralMail.php',
+    'App\\Models\\AdminModel' => $baseDir . '/app/Models/AdminModel.php',
+    'App\\Models\\NotificationModel' => $baseDir . '/app/Models/NotificationModel.php',
+    'App\\Models\\TransactionModel' => $baseDir . '/app/Models/TransactionModel.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
+    'App\\Models\\VirtualAccountModel' => $baseDir . '/app/Models/VirtualAccountModel.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Brick\\Math\\BigDecimal' => $vendorDir . '/brick/math/src/BigDecimal.php',
