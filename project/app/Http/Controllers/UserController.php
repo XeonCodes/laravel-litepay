@@ -67,7 +67,7 @@ class UserController extends Controller
             }
 
             // Create a new user
-            $user = User::create([
+            $user = DB::table("user")->insertOrIgnore([
                 "first_name" => $request->first_name,
                 "last_name" => $request->last_name,
                 "email" => $request->email,
@@ -78,6 +78,11 @@ class UserController extends Controller
                 "invited_by" => $invitedBy,
                 "otp" => bcrypt(value: $otp)
             ]);
+
+            DB::commit();
+
+
+            $user = User::where('email', $request->email)->first();
 
             // Notification
             NotificationModel::create([
@@ -95,7 +100,6 @@ class UserController extends Controller
                 Log::error("Error sending email: $th");
             }
 
-            DB::commit();
 
             // Generate Token
             $token = $user->createToken('mobile-app', ['read'])->plainTextToken;
