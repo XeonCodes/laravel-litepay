@@ -24,7 +24,6 @@ class VTUController extends Controller
     public function BuyAirtime(Request $request){
 
         $validate = Validator::make($request->all(), [
-            'network' => 'required|string',
             'amount' => 'required|numeric|min:1',
             'phone_number' => 'required|string|regex:/^([0-9\s\-\+\(\)]*)$/',
             'network_id' => 'required|string|in:mtn,airtel,glo,9mobile',
@@ -151,11 +150,9 @@ class VTUController extends Controller
             $transaction->save();
 
         }else {
-
             // Refund
             $user->balance += $request->amount;
             $user->save();
-
         }
 
         // Response
@@ -166,6 +163,6 @@ class VTUController extends Controller
 
     }
 
-    
+
 
 }
