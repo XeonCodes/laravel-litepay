@@ -16,8 +16,14 @@ class VTUController extends Controller
 
     protected $GenerateController;
 
-    public function __construct(GenerateController $generate_controller){
+    protected $dataBundle;
+
+    protected $apiCalls;
+
+    public function __construct(GenerateController $generate_controller, DataBundleController $data_bundle, ApiController $api_controller){
         $this->GenerateController = $generate_controller;
+        $this->dataBundle = $data_bundle;
+        $this->apiCalls = $api_controller;
     }
     
     public function BuyAirtime(Request $request){
@@ -161,6 +167,165 @@ class VTUController extends Controller
         ], 200);
 
     }
+
+
+    // Buy Data Plans
+    public function BuyData(Request $request) {
+
+        $validate = Validator::make($request->all(), [
+            'phone_number' => 'required|string|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'network_id' => 'required|string|in:mtn,airtel,glo,9mobile',
+            'plan_id' => 'required|string'
+        ]);
+
+        if($validate->fails()){
+            return response()->json([
+                "status" => 400,
+                "message" => $validate->errors()->first()
+            ], 400);
+        }
+
+        // Get user
+        $user = $request->user();
+
+        // Get data plan using the network id and plan id
+
+        $network_id = preg_replace('/\d/', '', $request->network_id);
+        $dataPlans = $this->dataBundle->DataPlansUser();
+        $planfromDataPlans = $dataPlans[$network_id][0]["PRODUCT"];
+
+        // Find the selected plan using the plan_code
+        $selectedPlan = null;
+        foreach ($planfromDataPlans as $plan) {
+            // Log::info($plan);
+            if ($plan['PRODUCT_ID'] == $request->plan_code) {
+                $selectedPlan = $plan;
+                break;
+            }
+        }
+
+        // If the plan is not found, return an error
+        if (!$selectedPlan) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Bad request',
+            ], 404);
+        }
+
+        // Check if user has sufficient amount 
+        if($user->balance < $selectedPlan['PRODUCT_AMOUNT']){
+            return response()->json([
+                'status' => 400,
+                'message' => 'Insufficient balance',
+            ], 400);
+        }
+
+
+        // Current date time
+        $created_at = now();
+        $ref = $this->GenerateController->GenerateVirtualAccountReference();
+
+        DB::beginTransaction();
+
+        try {
+            
+            $user = User::where('id', $user->id)->lockForUpdate()->first();
+
+            // Debit user
+            $user->balance -= $selectedPlan['PRODUCT_AMOUNT'];
+            $user->save();
+
+            // Transaction table
+            DB::table('transactions')->insertOrIgnore([
+                'user_id' => $user->id,
+                'amount' => $selectedPlan['PRODUCT_AMOUNT'],
+                'ref' => $ref,
+                'type' => 'debit',
+                'trans_type'=> 'data',
+                'status' => 'pending',
+                'merchant' => $request->network_id,
+                'beneficiary' => $request->phone_number,
+                'product' => $selectedPlan['PRODUCT_NAME'],
+                'narration' => $selectedPlan['PRODUCT_NAME'],
+                'created_at' => $created_at,
+            ]);
+
+            DB::commit();
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => 'Something went wrong. Try again!',
+            ], 500);
+        }
+
+
+        // Buy the plan.
+        $response = match ($selectedPlan['PRODUCT_SOURCE']) {
+            1 => $this->apiCalls->BuyDataStation(
+                $request->phone_number,
+                $request->network_id,
+                $request->plan_code,
+            ),
+            2 => $this->apiCalls->BuyDataGladT(
+                $request->phone_number,
+                $request->network_id,
+                $request->plan_code,
+                $request->txf
+            ),
+            3 => $this->apiCalls->BuyDataMostCheap(
+                $request->phone_number,
+                $request->network_id,
+                $request->plan_code,
+                $request->txf
+            )
+        };
+
+        if(!$response['status']){
+            // Refund
+            return response()->json([
+                'status' => 500,
+                'message' => 'Something went wrong. Try again!',
+            ], 500);
+        }
+
+
+        // Update transaction status
+        $transaction = TransactionModel::where("ref", $ref)->first();
+
+        if(!$transaction){
+
+            // Log
+
+            // Email
+
+            return response()->json([
+                'status' => 500,
+                'message' => 'Something went wrong. Try again!',
+            ], 500);
+        }
+
+
+        $transaction->status = "successful";
+        $transaction->profit = $selectedPlan['PRODUCT_AMOUNT'] - $response['amount'];
+        $transaction->save();
+
+        // Create notification
+
+        // Send email
+
+        // Send Push Notification
+
+        return response()->json([
+            "status" => 200,
+            "message" => "Data bought successfully",
+            "data" => []
+        ], 200);
+
+
+    }
+
 
 }
 
