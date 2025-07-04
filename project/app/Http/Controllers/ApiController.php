@@ -162,7 +162,7 @@ class ApiController extends Controller
             ]);
 
             $BuyJson = $Buy->json();
-            
+
             Log::info($BuyJson);
 
             if ($BuyJson['status'] != "ORDER_RECEIVED") {
@@ -329,6 +329,163 @@ class ApiController extends Controller
 
 
     }
+
+
+     // Resolve Electricity ClubKon
+     public function ResolveCable($iuc_number, $providerCode)
+     {
+ 
+         $buy = Http::withHeaders([
+             'Content-Type' => 'application/json'
+         ])->get("https://www.nellobytesystems.com/APIVerifyCableTVV1.0.asp", [
+                 "UserID" => env("CLUB_KON_ID"),
+                 "APIKey" => env("CLUB_KON"),
+                 'SmartCardNo' => $iuc_number,
+                 'CableTV' => $providerCode,
+             ]);
+ 
+         $jsonBuy = $buy->json();
+ 
+         // Log::info($jsonBuy);
+ 
+         if (isset($jsonBuy['status']) && $jsonBuy['status'] == '00') {
+             return [
+                 "status" => true,
+                 "customer_name" => $jsonBuy['customer_name'],
+             ];
+         } else {
+             return [
+                 "status" => false,
+                 "message" => "Check IUC Number and try again",
+             ];
+         }
+ 
+ 
+     }
+
+    // Buy Airtime
+    public function BuyCableClubKon($phone_number, $iuc_number, $provider_code, $plan_code, $ref)
+    {
+        try {
+            $Buy = Http::get('https://www.nellobytesystems.com/APICableTVV1.asp', [
+                'UserID' => env('CLUB_KON_ID'),
+                'APIKey' => env('CLUB_KON'),
+                'CableTV' => $provider_code,
+                'Package' => $plan_code,
+                'SmartCardNo' => $iuc_number,
+                'RequestID' => $ref,
+                'PhoneNo' => $phone_number,
+                'CallBackURL' => env("APP_URL") . "/v1/callback/clubkon"
+            ]);
+
+            $BuyJson = $Buy->json();
+            Log::info($BuyJson);
+
+            if ($BuyJson['status'] != "ORDER_RECEIVED") {
+                return [
+                    "status" => false,
+                    "message" => $BuyJson['status']
+                ];
+            } else {
+                return [
+                    "status" => true,
+                    "amount" => $BuyJson['amount'],
+                    "x_ref" => $BuyJson['orderid'],
+                    "response" => $BuyJson['status'],
+                    "message" => "Cable purchase processed successfully"
+                ];
+            }
+        } catch (Exception $th) {
+            return [
+                "status" => false,
+                "error" => $th->getMessage()
+            ];
+        }
+
+
+    }
+
+
+     // Resolve Electricity ClubKon
+     public function ResolveElectricy($meter_number, $networkCode)
+     {
+ 
+         $buy = Http::withHeaders([
+             'Content-Type' => 'application/json'
+         ])->get("https://www.nellobytesystems.com/APIVerifyElectricityV1.asp", [
+                     'ElectricCompany' => $networkCode,
+                     'MeterNo' => $meter_number,
+                     "UserID" => env("CLUB_KON_ID"),
+                     "APIKey" => env("CLUB_KON"),
+                 ]);
+ 
+         $jsonBuy = $buy->json();
+ 
+         Log::info($jsonBuy);
+ 
+         if (isset($jsonBuy['status']) && $jsonBuy['status'] == '00') {
+             return [
+                 "status" => true,
+                 "customer_name" => $jsonBuy['customer_name'],
+             ];
+         } else {
+             return [
+                 "status" => false,
+                 "message" => "User not found",
+             ];
+         }
+ 
+ 
+     }
+ 
+     // Buy Electricity
+     public function BuyElectricityClubKon($amount, $phone_number, $meter_number, $company_code, $ref)
+     {
+         try {
+             $Buy = Http::get('https://www.nellobytesystems.com/APIElectricityV1.asp', [
+                 'UserID' => env('CLUB_KON_ID'),
+                 'APIKey' => env('CLUB_KON'),
+                 'ElectricCompany' => $company_code,
+                 'MeterType' => "01",
+                 'Amount' => $amount,
+                 'MeterNo' => $meter_number,
+                 'RequestID' => $ref,
+                 'PhoneNo' => $phone_number,
+                 'CallBackURL' => env("APP_URL") . "/v1/callback/clubkon"
+             ]);
+ 
+ // https://www.nellobytesystems.com/APIElectricityV1.asp/UserID=CK123&APIKey=456&ElectricCompany=01&MeterType=01&MeterNo=1234567890&Amount=2000&PhoneNo=08149659347&CallBackURL=http://www.your-website.com
+ 
+ 
+             $BuyJson = $Buy->json();
+             Log::info($BuyJson);
+ 
+             if ($BuyJson['status'] != "ORDER_RECEIVED") {
+                 return [
+                     "status" => false,
+                     "message" => $BuyJson['status']
+                 ];
+             } else {
+                 return [
+                     "status" => true,
+                     "amount" => $BuyJson['amount'],
+                     "x_ref" => $BuyJson['orderid'],
+                     "response" => $BuyJson['status'],
+                     "message" => "Electricity purchase processed successfully"
+                 ];
+             }
+         } catch (Exception $th) {
+             return [
+                 "status" => false,
+                 "error" => $th->getMessage()
+             ];
+         }
+ 
+ 
+     }
+
+
+    
 
 
 }
